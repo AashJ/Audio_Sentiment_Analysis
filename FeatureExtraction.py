@@ -5,18 +5,25 @@ from sklearn import svm
 import numpy as np
 
 class Classifier(object):
-
-    def __init__(self, algorithm, x_train, y_train, iterations=1, averaged=False, eta=1.5, alpha=1.1):
+    def __init__(self, algorithm, x_train, y_train, possiblelabels, iterations=1, averaged=False, eta=1.5, alpha=1.1):
         self.alg = algorithm
+        # create a dictionary of classifiers for each label
+        self.classifiers = {}
+        self.possibleLabels = possiblelabels
         if algorithm == 'SVM':
-            x_train = self.v.fit_transform(x_train)
-            y_train = np.array(y_train)
-            self.clf = svm.LinearSVC()
-            self.clf.fit(x_train, y_train)
+            for label in possiblelabels:
+                clf = svm.LinearSVC()
+                y_split = np.array([int(y == label) for y in y_train])
+                clf.fit(x_train, y_split)
+                self.classifiers[label] = clf
 
-    def predict(self, x, y):
+    def predict(self, x):
         if self.alg == 'SVM':
-            return self.clf.predict(x)[0]
+            for label in self.possibleLabels:
+                prediction = self.classifiers[label].predict(x)
+                if prediction == 1:
+                    return prediction
+            return 'This example didn\'t fall into any of the categories'
 
 class FeatureSet(object):
     def __init__(self, version='1.0'):
@@ -34,6 +41,8 @@ class FeatureSet(object):
         # And the first-order differences (delta features)
         mfcc_delta = lbr.feature.delta(mfcc)
 
+        #TODO figure out what more features to extract
+
         return (mfcc, mfcc_delta)
 
     def getVector(self, path):
@@ -43,14 +52,14 @@ class FeatureSet(object):
 
 
 
-            #create vector representations
+            #TODO create vector representations of .wav files
 
 
 
 
             return mfcc_delta[0]
         else:
-            return [0]*100
+            return np.array([0]*100)
 
     def getDataFromFile(self, filepath):
         file = open(filepath + 'features')
@@ -80,12 +89,14 @@ class FeatureSet(object):
             output.write(str(filenames[i]))
             for v in X[i]:
                 output.write(' ' + str(v))
+            output.write(' ' + str(y[i]))
             output.write('\n')
 
 
 f = FeatureSet('1.1')
 f.storeData('noise_data/RAVDESS/Actor_01/')
-#_, X, y = f.getData('noise_data/RAVDESS/Actor_01/')
+names, X, y = f.getDataFromFile('noise_data/RAVDESS/Actor_01/')
+print(X)
 #print(str(y))
 #c = Classifier('SVM', X, y)
 #c.predictSVM()

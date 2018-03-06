@@ -5,13 +5,14 @@ from sklearn import svm
 import numpy as np
 
 class Classifier(object):
-    def __init__(self, algorithm, x_train, y_train, possiblelabels, iterations=1, averaged=False, eta=1.5, alpha=1.1):
+    def __init__(self, algorithm, x_train, y_train, iterations=1, averaged=False, eta=1.5, alpha=1.1):
         self.alg = algorithm
         # create a dictionary of classifiers for each label
         self.classifiers = {}
-        self.possibleLabels = possiblelabels
+        self.possibleLabels = list(set(y_train))
+
         if algorithm == 'SVM':
-            for label in possiblelabels:
+            for label in self.possibleLabels:
                 clf = svm.LinearSVC()
                 y_split = np.array([int(y == label) for y in y_train])
                 clf.fit(x_train, y_split)
@@ -20,7 +21,7 @@ class Classifier(object):
     def predict(self, x):
         if self.alg == 'SVM':
             for label in self.possibleLabels:
-                prediction = self.classifiers[label].predict(x)
+                prediction = self.classifiers[label].predict([x])[0]
                 if prediction == 1:
                     return prediction
             return 'This example didn\'t fall into any of the categories'
@@ -96,11 +97,8 @@ class FeatureSet(object):
 f = FeatureSet('1.1')
 f.storeData('noise_data/RAVDESS/Actor_01/')
 names, X, y = f.getDataFromFile('noise_data/RAVDESS/Actor_01/')
-print(X)
-#print(str(y))
-#c = Classifier('SVM', X, y)
-#c.predictSVM()
-
+c = Classifier('SVM', X, y)
+print(str(c.predict(f.getVector('noise_data/user/10.wav'))))
 #http://samcarcagno.altervista.org/blog/basic-sound-processing-python/
 
 

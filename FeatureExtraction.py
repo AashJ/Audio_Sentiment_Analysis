@@ -50,15 +50,28 @@ class FeatureSet(object):
         if self.version == '1.0':
             mfcc, mfcc_delta = self.getFeatures(path)
 
-
-
-
             #TODO create vector representations of .wav files
 
+            vector = [0]*1000
 
+            count = 0
+            for list in mfcc_delta:
+                for i in range(len(list)):
+                    if count < 1000:
+                        vector[count] = list[i]
+                    count += 1
+                if count > 500:
+                    break
 
+            for list in mfcc:
+                for i in range(len(list)):
+                    if count < 1000:
+                        vector[count] = list[i]
+                    count += 1
+                if count > 999:
+                    break
 
-            return mfcc_delta[0]
+            return vector
         else:
             return np.array([0]*100)
 
@@ -93,12 +106,52 @@ class FeatureSet(object):
             output.write(' ' + str(y[i]))
             output.write('\n')
 
+def getEmotion(label):
+    if label == 1:
+        return 'neutral'
 
-f = FeatureSet('1.1')
+    if label == 2:
+        return 'calm'
+
+    if label == 3:
+        return 'happy'
+
+    if label == 4:
+        return 'sad'
+
+    if label == 5:
+        return 'angry'
+
+    if label == 6:
+        return 'fearful'
+
+    if label == 7:
+        return 'disgust'
+
+    if label == 8:
+        return 'surprised'
+
+f = FeatureSet(version='1.0')
 f.storeData('noise_data/RAVDESS/Actor_01/')
+
 names, X, y = f.getDataFromFile('noise_data/RAVDESS/Actor_01/')
 c = Classifier('SVM', X, y)
-print(str(c.predict(f.getVector('noise_data/user/10.wav'))))
+
+'''
+for i in range(1, 11):
+    label = c.predict(f.getVector('noise_data/user/' + str(i) + '.wav'))
+    print(str(i) + '.wav')
+    printEmotion(label)
+'''
+
+#tests
+path = pathlib.Path().cwd()
+wavfilenames = np.array([file for file in os.listdir(str(path) + '/noise_data/RAVDESS/Actor_01/sound') if file.endswith(".wav")])
+emotions = [getEmotion(int(name.split('-')[2])) for name in wavfilenames]
+for i in range(len(wavfilenames)):
+    file = wavfilenames[i]
+    emotion = emotions[i]
+    label = c.predict(f.getVector('noise_data/RAVDESS/Actor_01/sound/' + str(file)))
+    print('noise_data/RAVDESS/Actor_01/sound/' + str(file) + ': ' + emotion + ' | ' + getEmotion(label))
+
 #http://samcarcagno.altervista.org/blog/basic-sound-processing-python/
-
-

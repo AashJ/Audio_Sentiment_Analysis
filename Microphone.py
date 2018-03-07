@@ -89,4 +89,4 @@ class Recorder(object):
         return text
 
 r = Recorder()
-print(r.recordWAV(5))
+print(r.recordWAV(10))

@@ -103,7 +103,8 @@ class Recorder(object):
     '''
     Uses google API to translate audio data to text.
     '''
-    def transcribe(self, path):
+    @staticmethod
+    def transcribe(path):
         r = sr.Recognizer()
         with sr.WavFile(path) as source:
             audio = r.record(source)  # extract audio data from the file

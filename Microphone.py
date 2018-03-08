@@ -84,21 +84,24 @@ class Recorder(object):
         file = open(savepath + 'names')
         lines = file.readlines()
         int_lines = [int(line) for line in lines]
-        newname = np.max(int_lines) + 1
+        distinguisher = np.max(int_lines) + 1
+        print("01 = neutral, 02 = calm, 03 = happy, 04 = sad, 05 = angry, 06 = fearful, 07 = disgust, 08 = surprised")
+        emotion = input('Which emotion was that: ')
 
+        newname = str(distinguisher) + '--' + emotion + '-'
         #save the signal data in a .wav file format
-        wf = wave.open(savepath + str(newname) + '.wav', 'wb')
+        wf = wave.open(savepath + 'sound/' + str(newname) + '.wav', 'wb')
         wf.setnchannels(self.channels)
         wf.setsampwidth(p.get_sample_size(self.format))
         wf.setframerate(self.rate)
         wf.writeframes(b''.join(frames))
         wf.close()
 
-        int_lines.append(newname)
+        int_lines.append(distinguisher)
         output = open(savepath + 'names', "w")
         for i in range(len(int_lines)):
             output.write(str(int_lines[i]) + "\n")
-        return savepath + str(newname) + '.wav'
+        return savepath + 'sound/' + str(newname) + '.wav'
 
     '''
     Uses google API to translate audio data to text.

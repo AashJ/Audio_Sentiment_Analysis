@@ -1,6 +1,7 @@
 import os, pathlib
 import numpy as np
 from AudioAnalyzer import AudioAnalyzer
+from TextAnalyzer import TextAnalyzer
 
 '''
 This class manages all the data storage of vector representations, getting data and storing data. We opt to include this
@@ -19,9 +20,12 @@ class DataManager(object):
     '''
     def getVector(self, path):
         if self.version == '1.0':
-            #TODO: For now, vector is created solely from Audio analysis. With hybrid, we can mix text + audio in vector
-            a = AudioAnalyzer('1.0')
-            return a.getVector(path)
+            #TODO
+            a = AudioAnalyzer(self.version)
+            #For now, vector is created solely from audio. With hybrid, we can mix text + audio in vector
+            t = TextAnalyzer(self.version)
+            vector = t.getVector(path)
+            return vector
         else:
             return np.array([0]*100)
 
@@ -59,7 +63,8 @@ class DataManager(object):
     Everything after that first element is a part of the vector representation of that .wav file, except for the last
     element, which is the label (emotion) for that file.
     
-    Data is stored in a file called 'features'
+    Data is stored in a file called 'features'. Note that storing data takes a long time, but after this is done it is
+    quick to simply read the data from the file in which it was stored. Hence, use this method sparingly.
     '''
     def storeData(self, filepath):
         filenames, X, y = self.getData(filepath + '/sound')

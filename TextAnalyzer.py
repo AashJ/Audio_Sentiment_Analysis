@@ -27,6 +27,27 @@ class TextAnalyzer:
         data = self.getFeatures(path)
         vector = []
         for arg in data:
-            vector += arg
+            vector += [arg]
 
         return np.array(vector)
+
+#sanity check
+'''
+text = Recorder.transcribe('noise_data/RAVDESS/Actor_01/sound/03-01-01-01-01-01-01.wav')
+print(text)
+blob = TextBlob(text)
+polarity, subjectivity = blob.sentiment
+print(str(polarity) + "||" + str(subjectivity))
+
+text = "I hate you, asshole"
+print(text)
+blob = TextBlob(text)
+polarity, subjectivity = blob.sentiment
+print(str(polarity) + "||" + str(subjectivity))
+
+text = "I love flowers!"
+print(text)
+blob = TextBlob(text)
+polarity, subjectivity = blob.sentiment
+print(str(polarity) + "||" + str(subjectivity))
+'''

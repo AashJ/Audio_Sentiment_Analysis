@@ -7,6 +7,7 @@ such as the features of that audio, the vector representation of that audio. 've
 representation the user wants to use.
 
 Ideas for which features to extract: http://www.fon.hum.uva.nl/praat/
+More ideas for which features to extract: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.690.6309&rep=rep1&type=pdf
 Library used for feature extraction: http://librosa.github.io/librosa/generated/librosa.feature.chroma_stft.html
 '''
 class AudioAnalyzer:
@@ -24,39 +25,74 @@ class AudioAnalyzer:
         frame_ms = 30
         mfcc = lbr.feature.mfcc(y=signal, sr=samplingRate, hop_length=int(samplingRate*frame_ms/1000), n_mfcc=13)
 
-        # And the first-order differences (delta features)
+        # The first-order differences (delta features)
         mfcc_delta = lbr.feature.delta(mfcc)
+
+        # Zero-crossing rate
+        zerorate = lbr.feature.zero_crossing_rate(signal)
+
+        # Roll-off frequency
+        rolloff = lbr.feature.spectral_rolloff(y=signal, sr=samplingRate)
+
+        # Spectral bandwidth
+        bandwidth = lbr.feature.spectral_bandwidth(y=signal, sr=samplingRate)
 
         #TODO: More features
 
-        return (mfcc, mfcc_delta)
+
+
+        return (mfcc, mfcc_delta, zerorate, rolloff, bandwidth)
 
     '''
     Returns a vector representation of the audio from the .wav file whose location is specified by 'path'.
     '''
     def getVector(self, path):
         if self.version == '1.0':
-            mfcc, mfcc_delta = self.getFeatures(path)
+            mfcc, mfcc_delta, zerorate, rolloff, bandwidth = self.getFeatures(path)
 
             #TODO: Come up with a better vector representation
 
-            vector = [0]*1000
+            vector = [0]*2500
 
             count = 0
             for list in mfcc_delta:
                 for i in range(len(list)):
-                    if count < 1000:
+                    if count < 2500:
                         vector[count] = list[i]
                     count += 1
                 if count > 500:
                     break
-
+            count = 500
             for list in mfcc:
                 for i in range(len(list)):
-                    if count < 1000:
+                    if count < 2500:
                         vector[count] = list[i]
                     count += 1
                 if count > 999:
+                    break
+
+            for list in zerorate:
+                for i in range(len(list)):
+                    if count < 2500:
+                        vector[count] = list[i]
+                    count += 1
+                if count > 1499:
+                    break
+
+            for list in rolloff:
+                for i in range(len(list)):
+                    if count < 2500:
+                        vector[count] = list[i]
+                    count += 1
+                if count > 1999:
+                    break
+
+            for list in bandwidth:
+                for i in range(len(list)):
+                    if count < 2500:
+                        vector[count] = list[i]
+                    count += 1
+                if count > 2499:
                     break
 
             return vector

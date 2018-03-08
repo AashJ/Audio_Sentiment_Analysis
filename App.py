@@ -51,8 +51,9 @@ def storeData(pathList, f):
 #r = Recorder()
 #r.recordWAV(8)
 
+
 f = DataManager(version='1.0')
-train_pathList = ['noise_data/RAVDESS/Actor_01']
+train_pathList = ['noise_data/RAVDESS/Actor_01', 'noise_data/RAVDESS/Actor_02']
 
 print('Storing data...')
 #storeData(train_pathList, f)
@@ -62,7 +63,7 @@ names, X, y = getTrainingData(train_pathList, f)
 
 #Fit the classifier
 print('Fitting classifier...')
-c = Classifier('SVM', X, y)
+c = Classifier('Decision tree', X, y)
 
 #Test the classifier
 print('Running tests...')
@@ -87,3 +88,4 @@ print('\n---------------RESULTS---------------')
 print("No. correct: " + str(correct))
 print("No. incorrect: " + str(incorrect))
 print("Accuracy: " + str(correct / (incorrect + correct)))
+

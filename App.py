@@ -1,7 +1,7 @@
 from Classifier import Classifier
 from DataManager import DataManager
-import numpy as np
 
+#Gets the emotion that each label corresponds to. See 'about' in RAVDESS for more info
 def getEmotion(label):
     if label == 1:
         return 'neutral'

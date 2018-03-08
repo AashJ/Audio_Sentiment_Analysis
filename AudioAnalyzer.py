@@ -1,14 +1,23 @@
 import librosa as lbr
-#http://librosa.github.io/librosa/generated/librosa.feature.chroma_stft.html
 import numpy as np
 
+'''
+Deal with everything to do with audio here. This takes as input a filepath to a .wav file and returns information
+such as the features of that audio, the vector representation of that audio. 'version' specifies which version feature
+representation the user wants to use.
+
+Ideas for which features to extract: http://www.fon.hum.uva.nl/praat/
+Library used for feature extraction: http://librosa.github.io/librosa/generated/librosa.feature.chroma_stft.html
+'''
 class AudioAnalyzer:
     def __init__(self, version='1.0'):
         self.version = version
 
+    '''
+    Extract features from the .wav file whose location is specified by 'path'.
+    '''
     def getFeatures(self, path):
         # e.g., features = getFeatures('noise_data/user/5.wav')
-        # ideas for which features to extract: http://www.fon.hum.uva.nl/praat/
         signal, samplingRate = lbr.load(path)
 
         # Compute MFCC features from the raw signal
@@ -18,15 +27,18 @@ class AudioAnalyzer:
         # And the first-order differences (delta features)
         mfcc_delta = lbr.feature.delta(mfcc)
 
-        #TODO figure out what more features to extract
+        #TODO: More features
 
         return (mfcc, mfcc_delta)
 
+    '''
+    Returns a vector representation of the audio from the .wav file whose location is specified by 'path'.
+    '''
     def getVector(self, path):
         if self.version == '1.0':
             mfcc, mfcc_delta = self.getFeatures(path)
 
-            #TODO create vector representations of .wav files
+            #TODO: Come up with a better vector representation
 
             vector = [0]*1000
 

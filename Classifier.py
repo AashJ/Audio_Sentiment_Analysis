@@ -1,4 +1,5 @@
 from sklearn import svm
+from sklearn import tree
 import numpy as np
 
 '''
@@ -21,6 +22,13 @@ class Classifier(object):
                 y_split = np.array([int(y == label) for y in y_train])
                 clf.fit(x_train, y_split)
                 self.classifiers[label] = clf
+        if algorithm == 'Decision tree':
+            for label in self.possibleLabels:
+                clf = tree.DecisionTreeClassifier()
+                y_split = np.array([int(y == label) for y in y_train])
+                clf.fit(x_train, y_split)
+                self.classifiers[label] = clf
+
 
     '''
     We allow for non-binary classification using SVM here by creating and storing a binary classifier for each class. 
@@ -28,14 +36,15 @@ class Classifier(object):
     red? (y/n)", 2: "is this example blue? (y/n)", 3: "is this example green? (y/n)".
     '''
     def predict(self, x):
-        if self.alg == 'SVM':
+        if self.alg == 'SVM' or self.alg == 'Decision tree':
             #Predict using all the binary SVM classifiers. As soon as one of them predicts positive our model predicts
             #that label
             for label in self.possibleLabels:
                 prediction = self.classifiers[label].predict([x])[0]
                 if prediction == 1:
-                    return prediction
+                    return label
             return 'This example didn\'t fall into any of the categories'
+
 
     def getLoss(self, x, y, dtype):
         #TODO: If we are doing hybrid approach, we might need this so that we can compute total loss

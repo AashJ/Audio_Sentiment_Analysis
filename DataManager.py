@@ -22,9 +22,9 @@ class DataManager(object):
         if self.version == '1.0':
             #TODO
             a = AudioAnalyzer(self.version)
-            #For now, vector is created solely from audio. With hybrid, we can mix text + audio in vector
+            #For now, vector is created by simply appending text vector to audio vector
             t = TextAnalyzer(self.version)
-            vector = t.getVector(path)
+            vector = np.append(a.getVector(path), t.getVector(path))
             return vector
         else:
             return np.array([0]*100)

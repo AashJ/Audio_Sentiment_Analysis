@@ -2,6 +2,7 @@ from Classifier import Classifier
 from DataManager import DataManager
 from Microphone import Recorder
 import numpy as np
+import pathlib, os
 
 #Gets the emotion that each label corresponds to. See 'about' in RAVDESS for more info
 def getEmotion(label):
@@ -51,25 +52,31 @@ def storeData(pathList, f):
 #r.recordWAV(8)
 
 f = DataManager(version='1.0')
-pathList = ['noise_data/user', 'noise_data/RAVDESS/Actor_01']
+train_pathList = ['noise_data/RAVDESS/Actor_01']
 
-storeData(pathList, f)
-names, X, y = getTrainingData(pathList, f)
+storeData(train_pathList, f)
+names, X, y = getTrainingData(train_pathList, f)
 
 #Fit the classifier
 c = Classifier('SVM', X, y)
 
-#Test on what we just trained on
+#Test the classifier
 correct, incorrect = 0, 0
-for i in range(len(names)):
-    file = names[i]
-    actual = y[i]
-    prediction = c.predict(X[i])
-    print(str(file) + ': ' + getEmotion(actual) + ' | ' + getEmotion(prediction))
-    if actual == prediction:
-        correct += 1
-    else:
-        incorrect += 1
+test_pathList = ['noise_data/user']
+for path in test_pathList:
+    path += '/sound'
+    init_path = pathlib.Path().cwd()
+    wavfilenames = np.array([file for file in os.listdir(str(init_path) + '/' + path) if file.endswith(".wav")])
+    vectors, labels = np.array([f.getVector(path + '/' + str(file)) for file in wavfilenames]), np.array([int(name.split('-')[2]) for name in wavfilenames])
+    for i in range(len(wavfilenames)):
+        file = wavfilenames[i]
+        actual = labels[i]
+        prediction = c.predict(vectors[i])
+        print(path + '/' + str(file) + ': ' + getEmotion(actual) + ' | ' + getEmotion(prediction))
+        if actual == prediction:
+            correct += 1
+        else:
+            incorrect += 1
 
 print('\n---------------RESULTS---------------')
 print("No. correct: " + str(correct))

@@ -1,59 +1,22 @@
 import os, pathlib
-import librosa as lbr
-#http://librosa.github.io/librosa/generated/librosa.feature.chroma_stft.html
 import numpy as np
+from AudioAnalyzer import AudioAnalyzer
 
 class DataManager(object):
     def __init__(self, version='1.0'):
         self.version = version
 
-    def getFeatures(self, path):
-        # e.g., features = getFeatures('noise_data/user/5.wav')
-        # ideas for which features to extract: http://www.fon.hum.uva.nl/praat/
-        signal, samplingRate = lbr.load(path)
-
-        # Compute MFCC features from the raw signal
-        frame_ms = 30
-        mfcc = lbr.feature.mfcc(y=signal, sr=samplingRate, hop_length=int(samplingRate*frame_ms/1000), n_mfcc=13)
-
-        # And the first-order differences (delta features)
-        mfcc_delta = lbr.feature.delta(mfcc)
-
-        #TODO figure out what more features to extract
-
-        return (mfcc, mfcc_delta)
-
     def getVector(self, path):
         if self.version == '1.0':
-            mfcc, mfcc_delta = self.getFeatures(path)
-
-            #TODO create vector representations of .wav files
-
-            vector = [0]*1000
-
-            count = 0
-            for list in mfcc_delta:
-                for i in range(len(list)):
-                    if count < 1000:
-                        vector[count] = list[i]
-                    count += 1
-                if count > 500:
-                    break
-
-            for list in mfcc:
-                for i in range(len(list)):
-                    if count < 1000:
-                        vector[count] = list[i]
-                    count += 1
-                if count > 999:
-                    break
-
-            return vector
+            #TODO: For now, vector is created solely from Audio analysis. With hybrid, we can mix text + audio in vector
+            a = AudioAnalyzer('1.0')
+            return a.getVector(path)
         else:
             return np.array([0]*100)
 
+
     def getDataFromFile(self, filepath):
-        file = open(filepath + 'features')
+        file = open(filepath + '/features')
         # creates a list of the lines in the source data
         lines = file.readlines()
         split_lines = []
@@ -66,14 +29,14 @@ class DataManager(object):
 
     def getData(self, filepath):
         path = pathlib.Path().cwd()
-        wavfilenames = np.array([file for file in os.listdir(str(path) + '/' + str(filepath) + 'sound') if file.endswith(".wav")])
-        return wavfilenames, np.array([self.getVector(filepath + 'sound/' + str(file)) for file in wavfilenames]), np.array([int(name.split('-')[2]) for name in wavfilenames])
+        wavfilenames = np.array([file for file in os.listdir(str(path) + '/' + filepath) if file.endswith(".wav")])
+        return wavfilenames, np.array([self.getVector(filepath + '/' + str(file)) for file in wavfilenames]), np.array([int(name.split('-')[2]) for name in wavfilenames])
 
     def storeData(self, filepath):
-        #e.g., storeData('noise_data/RAVDESS/Actor_01/')
-        filenames, X, y = self.getData(filepath)
+        #e.g., storeData('noise_data/RAVDESS/Actor_01')
+        filenames, X, y = self.getData(filepath + '/sound')
 
-        out = filepath + 'features'
+        out = filepath + '/features'
         output = open(out, "w")
 
         for i in range(len(X)):

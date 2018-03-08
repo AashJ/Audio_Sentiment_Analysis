@@ -22,3 +22,7 @@ class Classifier(object):
                 if prediction == 1:
                     return prediction
             return 'This example didn\'t fall into any of the categories'
+
+    def getLoss(self, x, y, dtype):
+        #TODO: If we are doing hybrid approach, we will need this so that we can compute total loss
+        return

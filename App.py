@@ -54,13 +54,18 @@ def storeData(pathList, f):
 f = DataManager(version='1.0')
 train_pathList = ['noise_data/RAVDESS/Actor_01']
 
-storeData(train_pathList, f)
+print('Storing data...')
+#storeData(train_pathList, f)
+
+print('Loading data...')
 names, X, y = getTrainingData(train_pathList, f)
 
 #Fit the classifier
+print('Fitting classifier...')
 c = Classifier('SVM', X, y)
 
 #Test the classifier
+print('Running tests...')
 correct, incorrect = 0, 0
 test_pathList = ['noise_data/user']
 for path in test_pathList:

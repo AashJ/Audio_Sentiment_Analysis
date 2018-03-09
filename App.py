@@ -48,12 +48,22 @@ def storeData(pathList, f):
     for path in pathList:
         f.storeData(path)
 
+'''
+i = 0
+init_path = pathlib.Path().cwd()
+fullpath = str(init_path) + '/noise_data/RAVDESS/Actor_02/sound'
+for file in os.listdir(fullpath):
+    i += 1
+    if file.endswith(".wav"):
+        os.rename(fullpath + '/' + str(file), fullpath + '/' + str(i) + '--3-.wav')
+'''
+
 #r = Recorder()
 #r.recordWAV(8)
 
 
 f = DataManager(version='1.0')
-train_pathList = ['noise_data/RAVDESS/Actor_01', 'noise_data/RAVDESS/Actor_02']
+train_pathList = ['noise_data/RAVDESS/Actor_01', 'noise_data/RAVDESS/Actor_02', 'noise_data/RAVDESS/Actor_03']
 
 print('Storing data...')
 #storeData(train_pathList, f)

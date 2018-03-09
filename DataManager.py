@@ -17,6 +17,8 @@ class DataManager(object):
 
     '''
     Gets a holistic (taking into account both audio and text) vector representation of a .wav file.
+    
+    Postcondition: returns a list; not a numpy array
     '''
     def getVector(self, path):
         if self.version == '1.0':
@@ -53,7 +55,20 @@ class DataManager(object):
     def getData(self, filepath):
         path = pathlib.Path().cwd()
         wavfilenames = np.array([file for file in os.listdir(str(path) + '/' + filepath) if file.endswith(".wav")])
-        return wavfilenames, np.array([self.getVector(filepath + '/' + str(file)) for file in wavfilenames]), np.array([int(name.split('-')[2]) for name in wavfilenames])
+
+        size = len(wavfilenames)
+        c = 0
+        p = 0
+        X = []
+        print('---' + '0% stored...', end="\r")
+        for file in wavfilenames:
+            X += [self.getVector(filepath + '/' + str(file))]
+            if int(100*c/size) != p:
+                p = int(100*c/size)
+                print('---' + str(p) + '% stored...', end="\r")
+            c += 1
+
+        return wavfilenames, np.array(X), np.array([int(name.split('-')[2]) for name in wavfilenames])
 
     '''
     Updates data text file of an Actor. E.g., calling storeData('noise_data/RAVDESS/Actor_01') would update the data

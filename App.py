@@ -1,7 +1,7 @@
 from Classifier import Classifier
 from DataManager import DataManager
 from Microphone import Recorder
-from sklearn.metrics import confusion_matrix as cm
+from sklearn.metrics import confusion_matrix
 import numpy as np
 import pathlib, os
 import warnings
@@ -51,7 +51,6 @@ def storeData(pathList, f):
     for path in pathList:
         print('--Storing ' + str(path) + ' ...')
         f.storeData(path)
-        print('--Done')
 
 '''
 #file formatting junk code (don't delete)
@@ -66,11 +65,12 @@ for file in os.listdir(fullpath):
 
 '''
 #record a snippet
+print('\n--------------RECORDING--------------')
 r = Recorder()
 r.recordWAV(8)
 '''
 
-print('-----------------------------')
+print('\n---------------RUNNING---------------')
 f = DataManager(version='1.0')
 train_pathList = ['noise_data/RAVDESS/Actor_02', 'noise_data/RAVDESS/Actor_03']
 
@@ -86,6 +86,7 @@ c = Classifier('Decision tree', X, y)
 
 #Test the classifier
 print('Running tests...')
+print('\n---------------RESULTS---------------')
 correct, incorrect, preds = 0, 0, []
 test_pathList = ['noise_data/user']
 for path in test_pathList:
@@ -104,9 +105,8 @@ for path in test_pathList:
         else:
             incorrect += 1
 
-print('\n---------------RESULTS---------------')
 print("No. correct: " + str(correct))
 print("No. incorrect: " + str(incorrect))
-print("Accuracy: " + str(correct / (incorrect + correct)))
-matrix = cm(labels, np.array(preds))
+print("Accuracy: " + str(round(100 * correct / (incorrect + correct), 2)) + '%')
+matrix = confusion_matrix(labels, np.array(preds))
 print("Confusion matrix:\n" + str(matrix))

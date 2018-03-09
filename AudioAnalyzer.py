@@ -50,20 +50,10 @@ class AudioAnalyzer:
 
             #TODO: Come up with a better vector representation
 
-            vector = [0]*1500
+            vector = [0]*2000
 
             count = 0
             for list in mfcc:
-                for i in range(len(list)):
-                    if count < 500:
-                        vector[count] = list[i]
-                    count += 1
-                if count > 499:
-                    break
-            count = 500
-
-
-            for list in mfcc_delta:
                 for i in range(len(list)):
                     if count < 1000:
                         vector[count] = list[i]
@@ -72,12 +62,22 @@ class AudioAnalyzer:
                     break
             count = 1000
 
-            for list in zerorate:
+
+            for list in mfcc_delta:
                 for i in range(len(list)):
                     if count < 1500:
                         vector[count] = list[i]
                     count += 1
                 if count > 1499:
+                    break
+            count = 1500
+
+            for list in zerorate:
+                for i in range(len(list)):
+                    if count < 2000:
+                        vector[count] = list[i]
+                    count += 1
+                if count > 1999:
                     break
             '''
             for list in rolloff:

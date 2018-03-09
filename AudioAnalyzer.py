@@ -32,53 +32,54 @@ class AudioAnalyzer:
         zerorate = lbr.feature.zero_crossing_rate(signal)
 
         # Roll-off frequency
-        rolloff = lbr.feature.spectral_rolloff(y=signal, sr=samplingRate)
+        #rolloff = lbr.feature.spectral_rolloff(y=signal, sr=samplingRate)
 
         # Spectral bandwidth
-        bandwidth = lbr.feature.spectral_bandwidth(y=signal, sr=samplingRate)
+        #bandwidth = lbr.feature.spectral_bandwidth(y=signal, sr=samplingRate)
 
         #TODO: More features
 
-
-
-        return (mfcc, mfcc_delta, zerorate, rolloff, bandwidth)
+        return (mfcc, mfcc_delta, zerorate)
 
     '''
     Returns a vector representation of the audio from the .wav file whose location is specified by 'path'.
     '''
     def getVector(self, path):
         if self.version == '1.0':
-            mfcc, mfcc_delta, zerorate, rolloff, bandwidth = self.getFeatures(path)
+            mfcc, mfcc_delta, zerorate = self.getFeatures(path)
 
             #TODO: Come up with a better vector representation
 
-            vector = [0]*2500
+            vector = [0]*1500
 
             count = 0
-            for list in mfcc_delta:
-                for i in range(len(list)):
-                    if count < 2500:
-                        vector[count] = list[i]
-                    count += 1
-                if count > 500:
-                    break
-            count = 500
             for list in mfcc:
                 for i in range(len(list)):
-                    if count < 2500:
+                    if count < 500:
+                        vector[count] = list[i]
+                    count += 1
+                if count > 499:
+                    break
+            count = 500
+
+
+            for list in mfcc_delta:
+                for i in range(len(list)):
+                    if count < 1000:
                         vector[count] = list[i]
                     count += 1
                 if count > 999:
                     break
+            count = 1000
 
             for list in zerorate:
                 for i in range(len(list)):
-                    if count < 2500:
+                    if count < 1500:
                         vector[count] = list[i]
                     count += 1
                 if count > 1499:
                     break
-
+            '''
             for list in rolloff:
                 for i in range(len(list)):
                     if count < 2500:
@@ -94,6 +95,7 @@ class AudioAnalyzer:
                     count += 1
                 if count > 2499:
                     break
+            '''
 
             return vector
         else:

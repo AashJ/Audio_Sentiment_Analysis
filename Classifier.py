@@ -7,7 +7,7 @@ This class allows the user to choose which classifier to run over the data.
 '''
 class Classifier(object):
 
-    def __init__(self, algorithm, x_train, y_train, iterations=1, averaged=False, eta=1.5, alpha=1.1):
+    def __init__(self, algorithm, x_train, y_train, maxdepth=200,iterations=1, averaged=False, eta=1.5, alpha=1.1):
         self.alg = algorithm
         # In this dictionary, the keys are labels and the values are classifiers. A label maps to it's corresponding
         # binary classifier
@@ -24,7 +24,7 @@ class Classifier(object):
                 self.classifiers[label] = clf
         if algorithm == 'Decision tree':
             for label in self.possibleLabels:
-                clf = tree.DecisionTreeClassifier()
+                clf = tree.DecisionTreeClassifier(max_depth=maxdepth)
                 y_split = np.array([int(y == label) for y in y_train])
                 clf.fit(x_train, y_split)
                 self.classifiers[label] = clf

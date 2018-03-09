@@ -1,8 +1,11 @@
 from Classifier import Classifier
 from DataManager import DataManager
 from Microphone import Recorder
+from sklearn.metrics import confusion_matrix as cm
 import numpy as np
 import pathlib, os
+import warnings
+warnings.filterwarnings("ignore")
 
 #Gets the emotion that each label corresponds to. See 'about' in RAVDESS for more info
 def getEmotion(label):
@@ -46,24 +49,30 @@ def getTrainingData(pathList, f):
 def storeData(pathList, f):
     # Store data (if not stored already from previous run)
     for path in pathList:
+        print('--Storing ' + str(path) + ' ...')
         f.storeData(path)
+        print('--Done')
 
 '''
+#file formatting junk code (don't delete)
 i = 0
 init_path = pathlib.Path().cwd()
 fullpath = str(init_path) + '/noise_data/RAVDESS/temp'
 for file in os.listdir(fullpath):
     i += 1
     if file.endswith(".wav"):
-        os.rename(fullpath + '/' + str(file), fullpath + '/' + str(i) + '--5-.wav')
+        os.rename(fullpath + '/' + str(file), fullpath + '/' + str(i) + '--8-.wav')
 '''
 
-#r = Recorder()
-#r.recordWAV(8)
+'''
+#record a snippet
+r = Recorder()
+r.recordWAV(8)
+'''
 
-
+print('-----------------------------')
 f = DataManager(version='1.0')
-train_pathList = ['noise_data/RAVDESS/Actor_01', 'noise_data/RAVDESS/Actor_02', 'noise_data/RAVDESS/Actor_03']
+train_pathList = ['noise_data/RAVDESS/Actor_02', 'noise_data/RAVDESS/Actor_03']
 
 print('Storing data...')
 #storeData(train_pathList, f)
@@ -77,7 +86,7 @@ c = Classifier('Decision tree', X, y)
 
 #Test the classifier
 print('Running tests...')
-correct, incorrect = 0, 0
+correct, incorrect, preds = 0, 0, []
 test_pathList = ['noise_data/user']
 for path in test_pathList:
     path += '/sound'
@@ -88,6 +97,7 @@ for path in test_pathList:
         file = wavfilenames[i]
         actual = labels[i]
         prediction = c.predict(vectors[i])
+        preds += [prediction]
         print(path + '/' + str(file) + ': ' + getEmotion(actual) + ' | ' + getEmotion(prediction))
         if actual == prediction:
             correct += 1
@@ -98,3 +108,5 @@ print('\n---------------RESULTS---------------')
 print("No. correct: " + str(correct))
 print("No. incorrect: " + str(incorrect))
 print("Accuracy: " + str(correct / (incorrect + correct)))
+matrix = cm(labels, np.array(preds))
+print("Confusion matrix:\n" + str(matrix))

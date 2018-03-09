@@ -51,11 +51,11 @@ def storeData(pathList, f):
 '''
 i = 0
 init_path = pathlib.Path().cwd()
-fullpath = str(init_path) + '/noise_data/RAVDESS/Actor_02/sound'
+fullpath = str(init_path) + '/noise_data/RAVDESS/temp'
 for file in os.listdir(fullpath):
     i += 1
     if file.endswith(".wav"):
-        os.rename(fullpath + '/' + str(file), fullpath + '/' + str(i) + '--3-.wav')
+        os.rename(fullpath + '/' + str(file), fullpath + '/' + str(i) + '--5-.wav')
 '''
 
 #r = Recorder()
@@ -98,4 +98,3 @@ print('\n---------------RESULTS---------------')
 print("No. correct: " + str(correct))
 print("No. incorrect: " + str(incorrect))
 print("Accuracy: " + str(correct / (incorrect + correct)))
-

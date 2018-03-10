@@ -29,6 +29,8 @@ class Classifier(object):
                 clf.fit(x_train, y_split)
                 self.classifiers[label] = clf
 
+        #TODO - Add neural network
+
 
     '''
     We allow for non-binary classification using SVM here by creating and storing a binary classifier for each class. 
@@ -66,8 +68,6 @@ class Classifier(object):
                 y_split = np.array([int(y == label) for y in y_train])
                 clf.fit(x_train, y_split)
                 self.classifiers[label] = clf
-
-
 
     def getLoss(self, x, y, dtype):
         #TODO: If we are doing hybrid approach, we might need this so that we can compute total loss

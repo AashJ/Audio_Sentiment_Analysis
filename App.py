@@ -7,6 +7,7 @@ import numpy as np
 import pathlib, os
 import warnings
 from statistics import *
+from time import sleep
 warnings.filterwarnings("ignore")
 
 #Gets the emotion that each label corresponds to. See 'about' in RAVDESS for more info
@@ -76,8 +77,10 @@ def test_classifier(c, test_pathList):
     print("No. correct: " + str(correct))
     print("No. incorrect: " + str(incorrect))
     print("Accuracy: " + str(round(100 * correct / (incorrect + correct), 2)) + '%')
-    #matrix = confusion_matrix(labels, np.array(preds))
-    #print("Confusion matrix:\n" + str(matrix))
+    matrix = confusion_matrix(labels, np.array(preds))
+    print("Confusion matrix:")
+    print('Columns(predictions), rows(actual)')
+    print(str(matrix))
 
 def cross_validate(c, X, y, num_folds=5, max_depth=200):
     scores_train = []
@@ -117,12 +120,17 @@ for file in os.listdir(fullpath):
         os.rename(fullpath + '/' + str(file), fullpath + '/' + str(i) + '--8-.wav')
 '''
 
-'''
+
 #record a snippet
-print('\n--------------RECORDING--------------')
-r = Recorder()
-r.recordWAV(8)
-'''
+print('--------------RECORDING--------------')
+for _ in range(0):
+    print('Starting a new recording...')
+    r = Recorder()
+    r.recordWAV(8)
+    print('Resetting...')
+    sleep(.5)
+
+
 
 print('\n---------------RUNNING---------------')
 f = DataManager(version='1.0')
@@ -143,6 +151,7 @@ c = Classifier(classifier, X, y, maxdepth=maxdepth)
 #Test the classifier
 print('Running tests...')
 print('\n---------------RESULTS---------------')
+print('Testing ' + classifier + ' on unseen data...')
 test_classifier(c, ['noise_data/user'])
 num_folds = 5
 print('\nCross validation... (' + str(num_folds) + ' folds, ' + classifier + ')')

@@ -22,9 +22,9 @@ class DataManager(object):
     '''
     def getVector(self, path):
         if self.version == '1.0':
-            #TODO
+            #TODO: come up with way to combine both vector representations
             a = AudioAnalyzer(self.version)
-            #For now, vector is created by simply appending text vector to audio vector
+            #For now, vector is created using only the audio vector
             #t = TextAnalyzer(self.version)
             vector = a.getVector(path)
             return vector

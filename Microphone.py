@@ -6,6 +6,7 @@ mlp.use('TkAgg')
 import matplotlib.pyplot as plt
 import numpy as np
 import speech_recognition as sr
+import sys
 
 '''
 This class allows audio input from users. It records and stores audio in the .wav file format. If the record() function
@@ -52,10 +53,11 @@ class Recorder(object):
         nchunks = int(RECORD_SECONDS * self.rate / self.chunk)
 
         frames = []
-        print("recording...")
+        print("Recording...")
         #Optimized graph displaying so that display isn't choppy
         for i in range(0, nchunks):
             #data from one chunk
+            # TODO: Fix bug - input overflow
             data = stream.read(self.chunk)
             frames.append(data)
             #convert from hex to decimal, take every other val in array
@@ -64,7 +66,7 @@ class Recorder(object):
             fig.canvas.draw()
             fig.canvas.flush_events()
         plt.show(block=False)
-        print("done recording")
+        print("Done recording")
         stream.stop_stream()
         stream.close()
         p.terminate()

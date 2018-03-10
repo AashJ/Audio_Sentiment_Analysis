@@ -28,6 +28,9 @@ class AudioAnalyzer:
         # Compute energy of each frame
         energy = lbr.feature.rmse(y=signal, hop_length=int(samplingRate*frame_ms/1000))
 
+        # Compute pitch using autocorrelation
+        autocorrelation = lbr.autocorrelate(signal)
+
         # The first-order differences (delta features)
         #mfcc_delta = lbr.feature.delta(mfcc)
 
@@ -42,14 +45,14 @@ class AudioAnalyzer:
 
         #TODO: More features
 
-        return (mfcc, energy)
+        return (mfcc, energy, autocorrelation)
 
     '''
     Returns a vector representation of the audio from the .wav file whose location is specified by 'path'.
     '''
     def getVector(self, path):
         if self.version == '1.0':
-            mfcc, energy = self.getFeatures(path)
+            mfcc, energy, autocorrelation = self.getFeatures(path)
 
             #TODO: Come up with a better vector representation
 
@@ -58,21 +61,28 @@ class AudioAnalyzer:
             count = 0
             for list in mfcc:
                 for i in range(len(list)):
-                    if count < 1500:
+                    if count < 1000:
                         vector[count] = list[i]
                     count += 1
-                if count > 1499:
+                if count > 999:
                     break
-            count = 1500
+            count = 1000
 
             for list in energy:
                 for i in range(len(list)):
-                    if count < 3000:
+                    if count < 2000:
                         vector[count] = list[i]
                     count += 1
-                if count > 2999:
+                if count > 1999:
                     break
-            count = 3000
+            count = 2000
+
+            for i in range(len(autocorrelation)):
+                if count < 3000:
+                    vector[count] = autocorrelation[i]
+                count += 1
+
+            count = 2999
 
             '''
             for list in mfcc_delta:

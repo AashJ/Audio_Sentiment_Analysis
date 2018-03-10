@@ -63,8 +63,8 @@ class DataManager(object):
         print('----' + '0% stored...', end="\r")
         for file in wavfilenames:
             X += [self.getVector(filepath + '/' + str(file))]
-            if int(100*c/size) != p:
-                p = int(100*c/size)
+            if round(100*c/size, 1) != p:
+                p = round(100*c/size, 1)
                 print('----' + str(p) + '% stored...', end="\r")
             c += 1
         print('----' + '100% stored.')

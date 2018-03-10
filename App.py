@@ -136,7 +136,7 @@ names, X, y = getTrainingData(train_pathList, f)
 
 #Fit the classifier
 print('Fitting classifier...')
-maxdepth = 4
+maxdepth = 10
 classifier = 'SVM'
 c = Classifier(classifier, X, y, maxdepth=maxdepth)
 

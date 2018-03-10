@@ -45,6 +45,29 @@ class Classifier(object):
                     return label
             return 'This example didn\'t fall into any of the categories'
 
+    def score(self, X, y):
+        correct = 0
+        for i in range(len(X)):
+            if self.predict(X[i]) == y[i]:
+                correct += 1
+        return correct / len(X)
+
+    def fit(self, x_train, y_train, maxdepth=200,iterations=1, averaged=False, eta=1.5, alpha=1.1):
+        if self.alg == 'SVM':
+            # Train a separate SVM classifier for each label
+            for label in self.possibleLabels:
+                clf = svm.LinearSVC()
+                y_split = np.array([int(y == label) for y in y_train])
+                clf.fit(x_train, y_split)
+                self.classifiers[label] = clf
+        if self.alg == 'Decision tree':
+            for label in self.possibleLabels:
+                clf = tree.DecisionTreeClassifier(max_depth=maxdepth)
+                y_split = np.array([int(y == label) for y in y_train])
+                clf.fit(x_train, y_split)
+                self.classifiers[label] = clf
+
+
 
     def getLoss(self, x, y, dtype):
         #TODO: If we are doing hybrid approach, we might need this so that we can compute total loss

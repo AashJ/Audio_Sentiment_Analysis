@@ -25,11 +25,14 @@ class AudioAnalyzer:
         frame_ms = 30
         mfcc = lbr.feature.mfcc(y=signal, sr=samplingRate, hop_length=int(samplingRate*frame_ms/1000), n_mfcc=13)
 
+        # Compute energy of each frame
+        energy = lbr.feature.rmse(y=signal, hop_length=int(samplingRate*frame_ms/1000))
+
         # The first-order differences (delta features)
-        mfcc_delta = lbr.feature.delta(mfcc)
+        #mfcc_delta = lbr.feature.delta(mfcc)
 
         # Zero-crossing rate
-        zerorate = lbr.feature.zero_crossing_rate(signal)
+        #zerorate = lbr.feature.zero_crossing_rate(signal)
 
         # Roll-off frequency
         #rolloff = lbr.feature.spectral_rolloff(y=signal, sr=samplingRate)
@@ -39,30 +42,39 @@ class AudioAnalyzer:
 
         #TODO: More features
 
-        return (mfcc, mfcc_delta, zerorate)
+        return (mfcc, energy)
 
     '''
     Returns a vector representation of the audio from the .wav file whose location is specified by 'path'.
     '''
     def getVector(self, path):
         if self.version == '1.0':
-            mfcc, mfcc_delta, zerorate = self.getFeatures(path)
+            mfcc, energy = self.getFeatures(path)
 
             #TODO: Come up with a better vector representation
 
-            vector = [0]*2000
+            vector = [0]*3000
 
             count = 0
             for list in mfcc:
                 for i in range(len(list)):
-                    if count < 1000:
+                    if count < 1500:
                         vector[count] = list[i]
                     count += 1
-                if count > 999:
+                if count > 1499:
                     break
-            count = 1000
+            count = 1500
 
+            for list in energy:
+                for i in range(len(list)):
+                    if count < 3000:
+                        vector[count] = list[i]
+                    count += 1
+                if count > 2999:
+                    break
+            count = 3000
 
+            '''
             for list in mfcc_delta:
                 for i in range(len(list)):
                     if count < 1500:
@@ -79,7 +91,7 @@ class AudioAnalyzer:
                     count += 1
                 if count > 1999:
                     break
-            '''
+            
             for list in rolloff:
                 for i in range(len(list)):
                     if count < 2500:

@@ -60,14 +60,14 @@ class DataManager(object):
         c = 0
         p = 0
         X = []
-        print('---' + '0% stored...', end="\r")
+        print('----' + '0% stored...', end="\r")
         for file in wavfilenames:
             X += [self.getVector(filepath + '/' + str(file))]
             if int(100*c/size) != p:
                 p = int(100*c/size)
-                print('---' + str(p) + '% stored...', end="\r")
+                print('----' + str(p) + '% stored...', end="\r")
             c += 1
-
+        print('----' + '100% stored.')
         return wavfilenames, np.array(X), np.array([int(name.split('-')[2]) for name in wavfilenames])
 
     '''

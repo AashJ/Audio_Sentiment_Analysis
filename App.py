@@ -2,9 +2,11 @@ from Classifier import Classifier
 from DataManager import DataManager
 from Microphone import Recorder
 from sklearn.metrics import confusion_matrix
+from sklearn.model_selection import train_test_split
 import numpy as np
 import pathlib, os
 import warnings
+from statistics import *
 warnings.filterwarnings("ignore")
 
 #Gets the emotion that each label corresponds to. See 'about' in RAVDESS for more info
@@ -52,6 +54,58 @@ def storeData(pathList, f):
         print('--Storing ' + str(path) + ' ...')
         f.storeData(path)
 
+def test_classifier(c, test_pathList):
+    correct, incorrect, preds = 0, 0, []
+    for path in test_pathList:
+        path += '/sound'
+        init_path = pathlib.Path().cwd()
+        wavfilenames = np.array([file for file in os.listdir(str(init_path) + '/' + path) if file.endswith(".wav")])
+        vectors, labels = np.array([f.getVector(path + '/' + str(file)) for file in wavfilenames]), np.array(
+            [int(name.split('-')[2]) for name in wavfilenames])
+        for i in range(len(wavfilenames)):
+            file = wavfilenames[i]
+            actual = labels[i]
+            prediction = c.predict(vectors[i])
+            preds += [prediction]
+            print(path + '/' + str(file) + ': ' + getEmotion(actual) + ' | ' + getEmotion(prediction))
+            if actual == prediction:
+                correct += 1
+            else:
+                incorrect += 1
+
+    print("No. correct: " + str(correct))
+    print("No. incorrect: " + str(incorrect))
+    print("Accuracy: " + str(round(100 * correct / (incorrect + correct), 2)) + '%')
+    #matrix = confusion_matrix(labels, np.array(preds))
+    #print("Confusion matrix:\n" + str(matrix))
+
+def cross_validate(c, X, y, num_folds=5, max_depth=200):
+    scores_train = []
+    scores_test = []
+    for i in range(num_folds):
+        print("Fold " + str(i + 1) + ":")
+        print('--Fitting classifier...')
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=1-(1/num_folds))
+        c.fit(X_train, y_train, maxdepth=max_depth)
+        train_acc = round(100 * c.score(X_train, y_train), 2)
+        test_acc = round(100 * c.score(X_test, y_test), 2)
+        print('--Train accuracy: ' + str(train_acc) + '%')
+        print('--Test accuracy: ' + str(test_acc) + '%')
+        scores_train = scores_train + [train_acc]
+        scores_test = scores_test + [test_acc]
+
+    train_mean = round(np.array(scores_train).mean(), 2)
+    test_mean = round(np.array(scores_test).mean(), 2)
+    train_margin = round(4.604 * stdev(np.array(scores_train)), 2)
+    test_margin = round(4.604 * stdev(np.array(scores_test)), 2)
+
+    print('\nAverage test data accuracy: ' + str(test_mean) + '% within (' + str(
+        test_mean-test_margin) + '%, ' + str(test_mean+test_margin) + '%) with 99% confidence')
+    print('Average train data accuracy: ' + str(train_mean) + '% within (' + str(
+        train_mean - train_margin) + '%, ' + str(train_mean + train_margin) + '%) with 99% confidence')
+
+
+
 '''
 #file formatting junk code (don't delete)
 i = 0
@@ -72,7 +126,7 @@ r.recordWAV(8)
 
 print('\n---------------RUNNING---------------')
 f = DataManager(version='1.0')
-train_pathList = ['noise_data/RAVDESS/Actor_02', 'noise_data/RAVDESS/Actor_03']
+train_pathList = ['noise_data/RAVDESS/Actor_01', 'noise_data/RAVDESS/Actor_02', 'noise_data/RAVDESS/Actor_03']
 
 print('Storing data...')
 #storeData(train_pathList, f)
@@ -82,31 +136,14 @@ names, X, y = getTrainingData(train_pathList, f)
 
 #Fit the classifier
 print('Fitting classifier...')
-c = Classifier('Decision tree', X, y)
+maxdepth = 4
+classifier = 'SVM'
+c = Classifier(classifier, X, y, maxdepth=maxdepth)
 
 #Test the classifier
 print('Running tests...')
 print('\n---------------RESULTS---------------')
-correct, incorrect, preds = 0, 0, []
-test_pathList = ['noise_data/user']
-for path in test_pathList:
-    path += '/sound'
-    init_path = pathlib.Path().cwd()
-    wavfilenames = np.array([file for file in os.listdir(str(init_path) + '/' + path) if file.endswith(".wav")])
-    vectors, labels = np.array([f.getVector(path + '/' + str(file)) for file in wavfilenames]), np.array([int(name.split('-')[2]) for name in wavfilenames])
-    for i in range(len(wavfilenames)):
-        file = wavfilenames[i]
-        actual = labels[i]
-        prediction = c.predict(vectors[i])
-        preds += [prediction]
-        print(path + '/' + str(file) + ': ' + getEmotion(actual) + ' | ' + getEmotion(prediction))
-        if actual == prediction:
-            correct += 1
-        else:
-            incorrect += 1
-
-print("No. correct: " + str(correct))
-print("No. incorrect: " + str(incorrect))
-print("Accuracy: " + str(round(100 * correct / (incorrect + correct), 2)) + '%')
-matrix = confusion_matrix(labels, np.array(preds))
-print("Confusion matrix:\n" + str(matrix))
+test_classifier(c, ['noise_data/user'])
+num_folds = 5
+print('\nCross validation... (' + str(num_folds) + ' folds, ' + classifier + ')')
+cross_validate(c, X, y, num_folds=num_folds, max_depth=maxdepth)

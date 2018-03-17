@@ -107,8 +107,6 @@ def cross_validate(c, X, y, num_folds=5, max_depth=200):
     print('Average train data accuracy: ' + str(train_mean) + '% within (' + str(
         train_mean - train_margin) + '%, ' + str(train_mean + train_margin) + '%) with 99% confidence')
 
-
-
 '''
 #file formatting junk code (don't delete)
 i = 0
@@ -131,7 +129,6 @@ for _ in range(0):
     sleep(.5)
 
 
-
 print('\n---------------RUNNING---------------')
 f = DataManager(version='1.0')
 train_pathList = ['noise_data/RAVDESS/Actor_01', 'noise_data/RAVDESS/Actor_02', 'noise_data/RAVDESS/Actor_03']
@@ -143,16 +140,30 @@ print('Loading data...')
 names, X, y = getTrainingData(train_pathList, f)
 
 #Fit the classifier
-print('Fitting classifier...')
+print('Fitting classifiers...')
 maxdepth = 10
-classifier = 'SVM'
-c = Classifier(classifier, X, y, maxdepth=maxdepth)
+classifiers = {}
+print('--Fitting SVM...')
+classifiers['SVM'] = Classifier('SVM', X, y, maxdepth=maxdepth)
+print('--Fitting decision tree...')
+classifiers['Decision tree'] = Classifier('Decision tree', X, y, maxdepth=maxdepth)
+
 
 #Test the classifier
 print('Running tests...')
 print('\n---------------RESULTS---------------')
+classifier = 'SVM'
+print('\n      -----------SVM-----------      ')
 print('Testing ' + classifier + ' on unseen data...')
-test_classifier(c, ['noise_data/user'])
+test_classifier(classifiers[classifier], ['noise_data/user'])
 num_folds = 5
 print('\nCross validation... (' + str(num_folds) + ' folds, ' + classifier + ')')
-cross_validate(c, X, y, num_folds=num_folds, max_depth=maxdepth)
+cross_validate(classifiers[classifier], X, y, num_folds=num_folds, max_depth=maxdepth)
+
+classifier = 'Decision tree'
+print('\n      ------Decision tree------      ')
+print('Testing ' + classifier + ' on unseen data...')
+test_classifier(classifiers[classifier], ['noise_data/user'])
+num_folds = 5
+print('\nCross validation... (' + str(num_folds) + ' folds, ' + classifier + ')')
+cross_validate(classifiers[classifier], X, y, num_folds=num_folds, max_depth=maxdepth)

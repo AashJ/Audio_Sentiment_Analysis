@@ -29,7 +29,7 @@ class DataManager(object):
             vector = a.getVector(path)
             return vector
         else:
-            return np.array([0]*100)
+            return [0]*100
 
     '''
     Extracts data for a particular Actor, using its stored data file. For example, I might call 

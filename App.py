@@ -10,7 +10,8 @@ from statistics import *
 from time import sleep
 warnings.filterwarnings("ignore")
 
-#Gets the emotion that each label corresponds to. See 'about' in RAVDESS for more info
+
+# Gets the emotion that each label corresponds to. See 'about' in RAVDESS for more info
 def getEmotion(label):
     if label == 1:
         return 'neutral'
@@ -38,6 +39,7 @@ def getEmotion(label):
 
     return 'N/A'
 
+
 def getTrainingData(pathList, f):
     # Extract and compile data from all specified directories
     names_cum, X_cum, y_cum = [], [], []
@@ -49,11 +51,13 @@ def getTrainingData(pathList, f):
         y_cum += y
     return np.array(names_cum), np.array(X_cum), np.array(y_cum)
 
+
 def storeData(pathList, f):
     # Store data (if not stored already from previous run)
     for path in pathList:
         print('--Storing ' + str(path) + ' ...')
         f.storeData(path)
+
 
 def test_classifier(c, test_pathList):
     correct, incorrect, preds = 0, 0, []
@@ -81,6 +85,7 @@ def test_classifier(c, test_pathList):
     print("Confusion matrix:")
     print('Columns(predictions), rows(actual)')
     print(str(matrix))
+
 
 def cross_validate(c, X, y, num_folds=5, max_depth=200):
     scores_train = []
@@ -118,8 +123,10 @@ for file in os.listdir(fullpath):
         os.rename(fullpath + '/' + str(file), fullpath + '/' + str(i) + '--8-.wav')
 '''
 
+DataManager.wave_to_spectogram('YO')
 
-#record a snippet
+
+# Record a snippet
 print('--------------RECORDING--------------')
 for _ in range(0):
     print('Starting a new recording...')
@@ -134,12 +141,12 @@ f = DataManager(version='1.0')
 train_pathList = ['noise_data/RAVDESS/Actor_01', 'noise_data/RAVDESS/Actor_02', 'noise_data/RAVDESS/Actor_03']
 
 print('Storing data...')
-#storeData(train_pathList, f)
+# storeData(train_pathList, f)
 
 print('Loading data...')
 names, X, y = getTrainingData(train_pathList, f)
 
-#Fit the classifier
+# Fit the classifier
 print('Fitting classifiers...')
 maxdepth = 10
 classifiers = {}
@@ -149,7 +156,7 @@ print('--Fitting decision tree...')
 classifiers['Decision tree'] = Classifier('Decision tree', X, y, maxdepth=maxdepth)
 
 
-#Test the classifier
+# Test the classifier
 print('Running tests...')
 print('\n---------------RESULTS---------------')
 classifier = 'SVM'
@@ -167,3 +174,9 @@ test_classifier(classifiers[classifier], ['noise_data/user'])
 num_folds = 5
 print('\nCross validation... (' + str(num_folds) + ' folds, ' + classifier + ')')
 cross_validate(classifiers[classifier], X, y, num_folds=num_folds, max_depth=maxdepth)
+
+
+def main():
+    DataManager.wave_to_spectogram('Yo')
+
+if __name__ == "__main__": main()

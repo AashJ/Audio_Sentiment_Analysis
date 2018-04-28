@@ -2,6 +2,10 @@ import os, pathlib
 import numpy as np
 from AudioAnalyzer import AudioAnalyzer
 from TextAnalyzer import TextAnalyzer
+import os
+import wave
+
+import pylab
 
 '''
 This class manages all the data storage of vector representations, getting data and storing data. We opt to include this
@@ -11,6 +15,8 @@ in a text file and when we need them again, we read from that text file.
 Precondition: The file structure must be formatted as in RAVDESS. That is, for every Actor folder, there must be a 
 folder named 'sound', with all the audio. 
 '''
+
+
 class DataManager(object):
     def __init__(self, version='1.0'):
         self.version = version
@@ -63,6 +69,7 @@ class DataManager(object):
         print('----' + '0% stored...', end="\r")
         for file in wavfilenames:
             X += [self.getVector(filepath + '/' + str(file))]
+            DataManager.wave_to_spectogram(file)
             if round(100*c/size, 1) != p:
                 p = round(100*c/size, 1)
                 print('----' + str(p) + '% stored...', end="\r")
@@ -93,3 +100,22 @@ class DataManager(object):
                 output.write(' ' + str(v))
             output.write(' ' + str(y[i]))
             output.write('\n')
+
+    @staticmethod
+    def graph_spectrogram(wav_file):
+        sound_info, frame_rate = DataManager.get_wav_info(wav_file)
+        pylab.figure(num=None, figsize=(19, 12))
+        pylab.subplot(111)
+        pylab.title('spectrogram of %r' % wav_file)
+        pylab.specgram(sound_info, Fs=frame_rate)
+        pylab.savefig('spectrogram.png')
+
+
+    @staticmethod
+    def get_wav_info(wav_file):
+        wav = wave.open(wav_file, 'r')
+        frames = wav.readframes(-1)
+        sound_info = pylab.fromstring(frames, 'int16')
+        frame_rate = wav.getframerate()
+        wav.close()
+        return sound_info, frame_rate

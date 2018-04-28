@@ -4,8 +4,8 @@ from AudioAnalyzer import AudioAnalyzer
 from TextAnalyzer import TextAnalyzer
 import os
 import wave
-
 import pylab
+from PIL import Image
 
 '''
 This class manages all the data storage of vector representations, getting data and storing data. We opt to include this
@@ -108,8 +108,15 @@ class DataManager(object):
         pylab.subplot(111)
         pylab.title('spectrogram of %r' % wav_file)
         pylab.specgram(sound_info, Fs=frame_rate)
-        pylab.savefig('spectrogram.png')
+        pylab.savefig(wav_file + '.png')
+        DataManager.crop_and_resize(wav_file + '.png')
 
+    @staticmethod
+    def crop_and_resize(img):
+        image = Image.open(img)
+        tgt = image.crop((235, 144, 1711, 1067))
+        tgt.thumbnail((256, 256), Image.ANTIALIAS)
+        tgt.save(img)
 
     @staticmethod
     def get_wav_info(wav_file):

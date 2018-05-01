@@ -102,14 +102,28 @@ class DataManager(object):
             output.write('\n')
 
     @staticmethod
+    def spectogram_dir(dir):
+        if not os.path.exists(dir + 'spectogram'):
+            os.makedirs(dir + 'spectogram')
+
+        for file in os.listdir(dir + 'sound'):
+            # for some reason, 112--6-.wav doesn't work.
+            if file != '.DS_Store' and file != '112--6-.wav' and file != '162--5-.wav':
+                DataManager.graph_spectrogram(dir + 'sound/' + file)
+
+
+    @staticmethod
     def graph_spectrogram(wav_file):
+        print(wav_file)
         sound_info, frame_rate = DataManager.get_wav_info(wav_file)
         pylab.figure(num=None, figsize=(19, 12))
         pylab.subplot(111)
         pylab.title('spectrogram of %r' % wav_file)
         pylab.specgram(sound_info, Fs=frame_rate)
-        pylab.savefig(wav_file + '.png')
-        DataManager.crop_and_resize(wav_file + '.png')
+        new_file = wav_file.replace('sound', 'spectogram')
+        pylab.savefig(new_file + '.png')
+        pylab.close()
+        DataManager.crop_and_resize(new_file + '.png')
 
     @staticmethod
     def crop_and_resize(img):
